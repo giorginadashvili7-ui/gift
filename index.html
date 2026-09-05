@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ჩუქება & იჩუქე - უფასო განცხადებები</title>
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- FontAwesome icons for Social Networks -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Noto Sans Georgian Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans Georgian', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#E8F5E9',
+                            100: '#C8E6C9',
+                            500: '#4CAF50',
+                            600: '#2E7D32',
+                            700: '#1B5E20',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased pb-20 md:pb-10 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
+
+    <!-- Toast Notification System -->
+    <div id="toast-container" class="fixed top-4 right-4 left-4 md:left-auto md:w-80 z-50 pointer-events-none flex flex-col gap-2"></div>
+
+    <!-- Header -->
+    <header class="sticky top-0 bg-white/90 backdrop-blur-md border-b border-slate-200/80 z-30 px-4 py-3 shadow-xs">
+        <div class="max-w-5xl mx-auto flex items-center justify-between">
+            <h1 class="text-xl font-bold text-brand-600 flex items-center gap-2 cursor-pointer select-none" onclick="switchTab('tab-home', document.querySelector('.nav-home-btn'))">
+                <span class="material-icons text-brand-600 text-2xl">card_giftcard</span>
+                <span class="tracking-tight">ჩუქება & იჩუქე</span>
+            </h1>
+
+            <div class="hidden sm:flex items-center gap-1 bg-brand-50 text-brand-700 px-3 py-1 rounded-full text-xs font-semibold">
+                <span class="material-icons text-sm">verified</span>
+                <span>100% უფასო პლატფორმა</span>
+            </div>
+
+            <!-- Desktop Navigation Menu -->
+            <nav class="hidden md:flex items-center gap-2">
+                <button class="desktop-nav-item active flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-brand-600 bg-brand-50 transition-all" onclick="switchTab('tab-home', this)">
+                    <span class="material-icons text-lg">home</span>
+                    <span>მთავარი</span>
+                </button>
+                <button class="desktop-nav-item flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all" onclick="switchTab('tab-filter', this)">
+                    <span class="material-icons text-lg">search</span>
+                    <span>ძებნა & ფილტრი</span>
+                </button>
+                <button class="desktop-nav-item flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition-all ml-2" onclick="switchTab('tab-add', this)">
+                    <span class="material-icons text-lg">add_circle</span>
+                    <span>დამატება</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-5xl mx-auto w-full px-4 pt-4 md:pt-6 flex-grow">
+        
+        <!-- TAB 1: Home List -->
+        <section id="tab-home" class="tab-content block space-y-4">
+            <!-- Offer / Request Toggle Tabs -->
+            <div class="flex items-center gap-1.5 p-1 bg-slate-200/70 rounded-xl w-full sm:w-auto self-start border border-slate-200" id="post-type-toggle">
+                <button class="type-tab active flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-bold text-slate-800 bg-white shadow-xs transition-all flex items-center justify-center gap-1.5" data-type="all">
+                    <span>ყველა</span>
+                </button>
+                <button class="type-tab flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5" data-type="offer">
+                    <span>🎁 გავაჩუქებ</span>
+                </button>
+                <button class="type-tab flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5" data-type="request">
+                    <span>🙏 ვიჩუქებ</span>
+                </button>
+            </div>
+
+            <!-- Home Quick Filter Strip -->
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1" id="home-category-chips">
+                <button class="chip active bg-brand-600 text-white px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shadow-xs" data-cat="">ყველა</button>
+                <button class="chip bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all" data-cat="ტანსაცმელი">👕 ტანსაცმელი</button>
+                <button class="chip bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all" data-cat="მედიკამენტები">💊 წამლები</button>
+                <button class="chip bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all" data-cat="საბავშვო">🧸 საბავშვო</button>
+                <button class="chip bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all" data-cat="ტექნიკა">💻 ტექნიკა</button>
+                <button class="chip bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all" data-cat="საოჯახო">🏡 საოჯახო</button>
+                <button class="chip bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all" data-cat="სხვა">📦 სხვა</button>
+            </div>
+
+            <div class="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
+                <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-1.5">
+                    <span class="material-icons text-brand-600 text-xl">style</span>
+                    <span>ბოლო განცხადებები</span>
+                </h2>
+                <span class="text-xs text-slate-400 font-medium" id="home-posts-count">იტვირთება...</span>
+            </div>
+            <div id="posts-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="text-center text-slate-400 py-12 text-sm col-span-full flex flex-col items-center gap-2">
+                    <span class="material-icons text-3xl text-slate-300 animate-spin">refresh</span>
+                    <span>მონაცემები იტვირთება...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: Filter/Search -->
+        <section id="tab-filter" class="tab-content hidden space-y-5">
+            <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+                <h2 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-2.5 flex items-center gap-2">
+                    <span class="material-icons text-brand-600">tune</span>
+                    <span>ძებნა და ფილტრაცია</span>
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Text Search Field -->
+                    <div class="space-y-1">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider">ძებნა ტექსტით</label>
+                        <div class="relative">
+                            <span class="material-icons absolute left-3 top-2.5 text-slate-400 text-xl">search</span>
+                            <input type="text" id="filter-keyword" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all placeholder:text-slate-400" placeholder="მოძებნე ნივთი, აღწერა, ქალაქი ან საკონტაქტო...">
+                        </div>
+                    </div>
+
+                    <!-- Post Type Filter -->
+                    <div class="space-y-1">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider">განცხადების ტიპი</label>
+                        <select id="filter-type" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                            <option value="">ყველა (გავაჩუქებ & ვიჩუქებ)</option>
+                            <option value="offer">🎁 გავაჩუქებ</option>
+                            <option value="request">🙏 ვიჩუქებ (მჭირდება)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- City Selector -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider">ქალაქი</label>
+                        <select id="filter-city" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                            <option value="">ყველა ქალაქი</option>
+                            <option value="თბილისი">თბილისი</option>
+                            <option value="ბათუმი">ბათუმი</option>
+                            <option value="ქუთაისი">ქუთაისი</option>
+                            <option value="რუსთავი">რუსთავი</option>
+                            <option value="გორი">გორი</option>
+                            <option value="ზუგდიდი">ზუგდიდი</option>
+                            <option value="ფოთი">ფოთი</option>
+                            <option value="ხაშური">ხაშური</option>
+                            <option value="სამტრედია">სამტრედია</option>
+                            <option value="სხვა">სხვა (მიუთითეთ)</option>
+                        </select>
+                        <!-- Other City Custom Input for Filter -->
+                        <input type="text" id="filter-city-other" class="hidden w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all placeholder:text-slate-400 mt-2" placeholder="ჩაწერეთ ქალაქი / სოფელი">
+                    </div>
+
+                    <!-- Category Chips -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider">კატეგორია</label>
+                        <div class="flex gap-2 overflow-x-auto no-scrollbar py-1" id="filter-category-chips">
+                            <button class="chip active bg-brand-600 text-white px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shadow-xs" data-cat="">ყველა</button>
+                            <button class="chip bg-slate-100 text-slate-600 hover:bg-slate-200 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all" data-cat="ტანსაცმელი">ტანსაცმელი</button>
+                            <button class="chip bg-slate-100 text-slate-600 hover:bg-slate-200 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all" data-cat="მედიკამენტები">მედიკამენტები</button>
+                            <button class="chip bg-slate-100 text-slate-600 hover:bg-slate-200 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all" data-cat="საბავშვო">საბავშვო</button>
+                            <button class="chip bg-slate-100 text-slate-600 hover:bg-slate-200 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all" data-cat="ტექნიკა">ტექნიკა</button>
+                            <button class="chip bg-slate-100 text-slate-600 hover:bg-slate-200 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all" data-cat="საოჯახო">საოჯახო</button>
+                            <button class="chip bg-slate-100 text-slate-600 hover:bg-slate-200 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all" data-cat="სხვა">სხვა</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="filtered-posts-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="text-center text-slate-400 py-12 text-sm col-span-full">აირჩიეთ ფილტრი ან ჩაწერეთ საძიებო სიტყვა</div>
+            </div>
+        </section>
+
+        <!-- TAB 3: Add Post (Ultra Compact Version) -->
+        <section id="tab-add" class="tab-content hidden max-w-xl mx-auto">
+            <form id="add-post-form" class="space-y-3.5 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                    <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <span class="material-icons text-brand-600">add_circle</span>
+                        <span>განცხადების დამატება</span>
+                    </h2>
+                    <span class="text-xs text-brand-600 bg-brand-50 font-medium px-2.5 py-0.5 rounded-full">სწრაფი ფორმა</span>
+                </div>
+
+                <!-- Post Type Selector (Gachuka / Vichukeb) -->
+                <div class="space-y-1">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider">განცხადების ტიპი *</label>
+                    <div class="grid grid-cols-2 gap-2" id="form-type-selector">
+                        <button type="button" data-val="offer" class="type-btn active p-2.5 rounded-xl border border-brand-500 bg-brand-50 text-brand-700 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 transition-all">
+                            <span>🎁</span>
+                            <span>გავაჩუქებ</span>
+                        </button>
+                        <button type="button" data-val="request" class="type-btn p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 hover:bg-slate-100 transition-all">
+                            <span>🙏</span>
+                            <span>ვიჩუქებ / მჭირდება</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 1-Click Category Selection -->
+                <div class="space-y-1">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider">კატეგორია *</label>
+                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5" id="form-category-selector">
+                        <button type="button" data-val="ტანსაცმელი" class="cat-btn active p-2 rounded-xl border border-brand-500 bg-brand-50 text-brand-700 text-xs font-medium text-center transition-all">👕 ტანსაცმელი</button>
+                        <button type="button" data-val="მედიკამენტები" class="cat-btn p-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-xs font-medium text-center hover:bg-slate-100 transition-all">💊 წამლები</button>
+                        <button type="button" data-val="საბავშვო" class="cat-btn p-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-xs font-medium text-center hover:bg-slate-100 transition-all">🧸 საბავშვო</button>
+                        <button type="button" data-val="ტექნიკა" class="cat-btn p-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-xs font-medium text-center hover:bg-slate-100 transition-all">💻 ტექნიკა</button>
+                        <button type="button" data-val="საოჯახო" class="cat-btn p-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-xs font-medium text-center hover:bg-slate-100 transition-all">🏡 საოჯახო</button>
+                        <button type="button" data-val="სხვა" class="cat-btn p-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-xs font-medium text-center hover:bg-slate-100 transition-all">📦 სხვა</button>
+                    </div>
+                </div>
+
+                <!-- Title & Description Compact -->
+                <div class="space-y-2">
+                    <input type="text" id="post-title" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all placeholder:text-slate-400 font-medium" placeholder="სათაური (მაგ. გავაჩუქებ ქურთუკს) *" required>
+                    <textarea id="post-desc" rows="2" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all placeholder:text-slate-400 resize-none" placeholder="მოკლე აღწერა (ზომა, მდგომარეობა და ა.შ.) *" required></textarea>
+                </div>
+
+                <!-- Quick City Selector -->
+                <div class="space-y-1">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider">ქალაქი *</label>
+                    <div class="flex gap-1.5 flex-wrap" id="form-city-selector">
+                        <button type="button" data-val="თბილისი" class="city-btn active px-3 py-1.5 rounded-lg border border-brand-500 bg-brand-50 text-brand-700 text-xs font-medium transition-all">თბილისი</button>
+                        <button type="button" data-val="ბათუმი" class="city-btn px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-600 text-xs font-medium hover:bg-slate-100 transition-all">ბათუმი</button>
+                        <button type="button" data-val="ქუთაისი" class="city-btn px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-600 text-xs font-medium hover:bg-slate-100 transition-all">ქუთაისი</button>
+                        <button type="button" data-val="რუსთავი" class="city-btn px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-600 text-xs font-medium hover:bg-slate-100 transition-all">რუსთავი</button>
+                        <button type="button" data-val="გორი" class="city-btn px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-600 text-xs font-medium hover:bg-slate-100 transition-all">გორი</button>
+                        <button type="button" data-val="ზუგდიდი" class="city-btn px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-600 text-xs font-medium hover:bg-slate-100 transition-all">ზუგდიდი</button>
+                        <button type="button" data-val="სხვა" class="city-btn px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-600 text-xs font-medium hover:bg-slate-100 transition-all">სხვა...</button>
+                    </div>
+                    <input type="text" id="post-city-other" class="hidden w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all placeholder:text-slate-400 mt-1.5" placeholder="მიუთითეთ ქალაქი / სოფელი">
+                </div>
+
+                <!-- Compact Contact Selector & Input -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider">კონტაქტი & PIN *</label>
+                    <div class="flex items-center gap-1.5" id="contact-type-selector">
+                        <button type="button" data-type="phone" class="contact-btn active px-3 py-1.5 rounded-lg border border-brand-500 bg-brand-50 text-brand-600 text-xs font-medium flex items-center gap-1 transition-all"><i class="fa-solid fa-phone"></i> ტელეფონი</button>
+                        <button type="button" data-type="whatsapp" class="contact-btn px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 text-xs font-medium flex items-center gap-1 hover:bg-slate-100 transition-all"><i class="fa-brands fa-whatsapp text-emerald-600"></i> WhatsApp</button>
+                        <button type="button" data-type="facebook" class="contact-btn px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 text-xs font-medium flex items-center gap-1 hover:bg-slate-100 transition-all"><i class="fa-brands fa-facebook text-blue-600"></i> FB</button>
+                        <button type="button" data-type="instagram" class="contact-btn px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 text-xs font-medium flex items-center gap-1 hover:bg-slate-100 transition-all"><i class="fa-brands fa-instagram text-pink-600"></i> IG</button>
+                    </div>
+
+                  <div class="space-y-4">
+  <!-- საკონტაქტო ველის ჯგუფი -->
+  <div class="space-y-1.5">
+    <label for="post-contact" class="block text-xs font-semibold uppercase tracking-wider text-slate-600">
+      საკონტაქტო ინფორმაცია <span class="text-rose-500">*</span>
+    </label>
+    <input 
+      type="text" 
+      id="post-contact" 
+      class="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 transition-all focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500" 
+      placeholder="ნომერი ან პროფილის ბმული" 
+      required
+    >
+  </div>
+
+  <!-- PIN კოდის ველის ჯგუფი -->
+  <div class="space-y-1.5">
+    <label for="post-pin" class="block text-xs font-semibold uppercase tracking-wider text-slate-600">
+      PIN კოდი <span class="text-rose-500">*</span>
+    </label>
+    <p class="text-[11px] leading-tight text-slate-500">
+      მიუთითეთ 4-ნიშნა ციფრული PIN კოდი და დაიმახსოვრეთ, რომ მომავალში შეძლოთ პოსტის წაშლა.
+    </p>
+    <input 
+      type="password" 
+      id="post-pin" 
+      class="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-center font-mono text-sm tracking-widest text-slate-800 placeholder:font-sans placeholder:text-xs placeholder:tracking-normal placeholder:text-slate-400 transition-all focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500" 
+      maxlength="4" 
+      pattern="\d{4}" 
+      placeholder="ჩაწერეთ 4-ნიშნა PIN" 
+      required 
+      title="4-ნიშნა ციფრული PIN პოსტის წაშლისთვის"
+    >
+  </div>
+</div>
+
+                </div>
+
+                <button type="submit" id="submit-post-btn" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold p-3 rounded-xl shadow-md shadow-brand-100 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm mt-2">
+                    <span class="material-icons text-base">send</span>
+                    <span>გამოქვეყნება</span>
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation Bar (Mobile Only) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200/80 z-40 md:hidden">
+        <div class="max-w-md mx-auto flex justify-around items-center h-16">
+            <button class="nav-item nav-home-btn active flex flex-col items-center justify-center w-full h-full text-brand-600 transition-colors" onclick="switchTab('tab-home', this)">
+                <span class="material-icons text-2xl">home</span>
+                <span class="text-[10px] font-medium mt-0.5">მთავარი</span>
+            </button>
+            <button class="nav-item flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-slate-600 transition-colors" onclick="switchTab('tab-filter', this)">
+                <span class="material-icons text-2xl">search</span>
+                <span class="text-[10px] font-medium mt-0.5">ძებნა</span>
+            </button>
+            <button class="nav-item flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-slate-600 transition-colors" onclick="switchTab('tab-add', this)">
+                <span class="material-icons text-2xl">add_circle</span>
+                <span class="text-[10px] font-medium mt-0.5">დამატება</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-2xl p-5 w-11/12 max-w-xs shadow-2xl space-y-4 transform scale-95 transition-transform duration-200" id="delete-modal-box">
+            <div class="flex items-center gap-2 text-red-600">
+                <span class="material-icons text-2xl">delete_forever</span>
+                <h3 class="text-base font-bold text-slate-900">პოსტის წაშლა</h3>
+            </div>
+            <p class="text-xs text-slate-500 leading-relaxed">შეიყვანეთ პოსტის შექმნისას მითითებული 4-ნიშნა PIN კოდი:</p>
+            <input type="password" id="delete-pin-input" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-center font-mono text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-red-500" maxlength="4" pattern="\d{4}" placeholder="****">
+            <div class="flex justify-end gap-2 pt-1">
+                <button class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors" onclick="closeDeleteModal()">გაუქმება</button>
+                <button id="confirm-delete-btn" class="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors shadow-xs">წაშლა</button>
+            </div>
+        </div>
+    </div>
+
+<script type="module" src="script.js">script.js</script>
+
+</body>
+</html>
